@@ -20,7 +20,7 @@ def get_db():
 
 @app.post("/draws", response_model=schemas.DrawResponse)
 def create_draw(db: Session = Depends(get_db)):
-    # Check if there's an open draw
+
     open_draw = db.query(models.Draw).filter(models.Draw.status == "open").first()
     if open_draw:
         raise HTTPException(status_code=400, detail="There is already an open draw")
@@ -34,7 +34,7 @@ def create_draw(db: Session = Depends(get_db)):
 
 @app.post("/tickets", response_model=schemas.TicketResponse)
 def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
-    # Check if draw exists and is open
+
     draw = db.query(models.Draw).filter(models.Draw.id == ticket.draw_id).first()
     if not draw:
         raise HTTPException(status_code=404, detail="Draw not found")
@@ -59,12 +59,11 @@ def close_draw(draw_id: int, db: Session = Depends(get_db)):
     if draw.status == "closed":
         raise HTTPException(status_code=400, detail="Draw is already closed")
 
-    # Generate winning numbers (5 unique numbers between 1 and 36)
+
     winning_numbers = sorted(random.sample(range(1, 37), 5))
     draw.winning_numbers = winning_numbers
     draw.status = "closed"
 
-    # Update tickets to mark winners
     tickets = db.query(models.Ticket).filter(models.Ticket.draw_id == draw_id).all()
     for ticket in tickets:
         ticket.is_winner = sorted(ticket.numbers) == winning_numbers
