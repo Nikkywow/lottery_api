@@ -5,7 +5,7 @@ class Draw(Base):
     __tablename__ = "draws"
 
     id = Column(Integer, primary_key=True, index=True)
-    status = Column(String, default="open")  # 'open' or 'closed'
+    status = Column(String, default="open")  # 'open' / 'closed'
     winning_numbers = Column(JSON, nullable=True)
 
 class Ticket(Base):
